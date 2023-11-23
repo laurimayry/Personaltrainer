@@ -2,8 +2,8 @@
   "name": "personaltrainer",
   "private": true,
   "version": "0.0.0",
-  "homepage": "https://laurimayry.github.io/personaltrainer",
   "type": "module",
+  "homepage": "https://laurimayry.github.io/personaltrainer",
 
   "scripts": {
     "dev": "vite",

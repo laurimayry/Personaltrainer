@@ -6,21 +6,24 @@ import './index.css';
 import App from './App.jsx';
 import Customers from './components/Customers.jsx';
 import Practises from './components/Practises.jsx';
-//import Customers from './components/Customers.jsx';
 
 
 const router = createBrowserRouter([
   {
-    path: "/",
+    path: "/personaltrainer/",
     element: <App />,
     children: [
       {
-        path: "/customers",
+        path: "customers",
         element: <Customers />,
       },
       {
-        path: "/practises",
+        path: "practises",
         element: <Practises />,
+      },
+      {
+        path: "customers/:selfLinkObj",
+        element: <Customers />,
       },
     ]   
   }

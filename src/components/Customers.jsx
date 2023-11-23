@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react';
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-material.css";
 import Button from '@mui/material/Button';
-
+import AddCustomer from './AddCustomer';
 import { AgGridReact } from "ag-grid-react";
+//import { useParams } from 'react-router-dom';
+
 
 import  Container  from '@mui/material/Container';
 //import TextField from '@mui/material/TextField';
@@ -13,19 +15,13 @@ import Stack from '@mui/material/Stack';
 
 function Customers() {
   const [customer, setCustomer] = useState([]);
-  const [newCustomer, setNewCustomer] = useState({
-    firstname: '',
-    lastname: '',
-    streetaddress: '',
-    postcode: '',
-    city: '',
-    email: '',
-    phone: ''
-  });
-  
-  
+  //const {selectedCustomer, setSelectedCustomer} = useState
+
   useEffect(() => {
     fetchCustomers();
+    //fetchOneCustomer();
+
+
   }, []);
 
   const [content] = useState([
@@ -56,6 +52,7 @@ function Customers() {
     .then(data => {
       if (Array.isArray(data.content)) {
         setCustomer(data.content);
+        console.log(data.content)
       } else {
         throw new Error("Haettu data ei ole taulukko");
       }
@@ -63,7 +60,6 @@ function Customers() {
     .catch(error => {
       console.error("Virhe:", error);
   })}
-
 
   //POISTAA ASIAKKAAN
   const deleteCustomer = (links) => {
@@ -73,8 +69,10 @@ function Customers() {
       if (url) {
         fetch(url.href, { method: 'DELETE' })
           .then(response => {
-            if (response.ok)
+            if (response.ok){
               fetchCustomers();
+              console.log(url);
+            }
             else
               throw new Error("Error in DELETE: " + response.statusText);
           })
@@ -86,53 +84,16 @@ function Customers() {
   };
 
   //LISÄÄ ASIAKKAAN
-  const handleInputChange = (e) => {
-    setNewCustomer({
-      ...newCustomer,
-      [e.target.name]: e.target.value
-    });
-  };
-
-  const addCustomer =() => {
-    fetch('http://traineeapp.azurewebsites.net/api/customers', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(newCustomer)
-  })
-    .then(response => {
-      if(response.ok)
-        fetchCustomers();
-      else
-        throw new Error("Error in POST: " + response.statusText);
-    })
-      .catch(err => console.log(err));
-  };
-
-
-
-
- 
   
-  
+  //ETSII YHDEN ASIAKKAAN, customers/{id}
+
 
   return (
     <Container>
 
       <h1>Customers</h1>
       <Stack>
-<div>
-          <input type="text" name="firstname" placeholder="Firstname" onChange={handleInputChange} />
-          <input type="text" name="lastname" placeholder="Lastname" onChange={handleInputChange} />
-          <input type="text" name="streetaddress" placeholder="Street Address" onChange={handleInputChange} />
-          <input type="text" name="postcode" placeholder="Postcode" onChange={handleInputChange} />
-          <input type="text" name="city" placeholder="City" onChange={handleInputChange} />
-          <input type="text" name="email" placeholder="Email" onChange={handleInputChange} />
-          <input type="text" name="phone" placeholder="Phone" onChange={handleInputChange} />
-          <Button size="small" onClick={addCustomer}>Add Customer</Button>
-        </div>
-
+        <AddCustomer fetchCustomers={fetchCustomers}/>
         <div className="ag-theme-material" style={{ height: 500 }}>
           <AgGridReact
             rowData={customer}

@@ -9,8 +9,8 @@ function App() {
   return (
     <div className="App">
     <nav>
-    <Link to={"/customers"}>Customers</Link>
-    <Link to={"/practises"}>Practises</Link>
+    <Link to={"customers"}>Customers</Link>
+    <Link to={"practises"}>Practises</Link>
     </nav>
     <Outlet />
     </div>
