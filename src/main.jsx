@@ -21,10 +21,7 @@ const router = createBrowserRouter([
         path: "practises",
         element: <Practises />,
       },
-      {
-        path: "customers/:selfLinkObj",
-        element: <Customers />,
-      },
+
     ]   
   }
 ]);

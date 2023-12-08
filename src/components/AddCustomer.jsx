@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Button from '@mui/material/Button';
 import PropTypes from 'prop-types'; 
+import { TextField } from '@mui/material';
 
 
 
@@ -44,52 +45,52 @@ const saveCustomer = () => {
   }
 
   return(
-    <div>
+    <div> 
       <h2>Add Customer</h2>
       <div>
-        <input
+        <TextField
           type="text"
           name="firstname"
           placeholder="Firstname"
           onChange={handleInputChange}
           value={newCustomer.firstname}
         />
-        <input
+        <TextField
           type="text"
           name="lastname"
           placeholder="Lastname"
           onChange={handleInputChange}
           value={newCustomer.lastname}
         />
-        <input
+        <TextField
           type="text"
           name="streetaddress"
           placeholder="Street Address"
           onChange={handleInputChange}
           value={newCustomer.streetaddress}
         />
-        <input
+        <TextField
           type="text"
           name="postcode"
           placeholder="postcode"
           onChange={handleInputChange}
           value={newCustomer.postcode}
         />
-        <input
+        <TextField
           type="text"
           name="city"
           placeholder="city"
           onChange={handleInputChange}
           value={newCustomer.city}
         />
-        <input
+        <TextField
           type="text"
           name="email"
           placeholder="email"
           onChange={handleInputChange}
           value={newCustomer.email}
         />
-        <input
+        <TextField
           type="text"
           name="phone"
           placeholder="phone"
@@ -97,7 +98,7 @@ const saveCustomer = () => {
           value={newCustomer.phone}
         />
         {/* Add more input fields as needed */}
-        <Button size="small" onClick={saveCustomer}>
+        <Button variant='contained' onClick={saveCustomer}>
           Add Customer
         </Button>
       </div>

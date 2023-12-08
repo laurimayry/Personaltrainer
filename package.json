@@ -4,7 +4,6 @@
   "version": "0.0.0",
   "type": "module",
   "homepage": "https://laurimayry.github.io/personaltrainer",
-
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -17,9 +16,13 @@
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
     "@mui/icons-material": "^5.14.16",
-    "@mui/material": "^5.14.17",
+    "@mui/lab": "^5.0.0-alpha.154",
+    "@mui/material": "^5.14.19",
+    "@mui/x-date-pickers": "^6.16.1",
     "ag-grid-community": "^30.2.1",
     "ag-grid-react": "^30.2.1",
+    "date-fns": "^2.30.0",
+    "dayjs": "^1.11.10",
     "localforage": "^1.10.0",
     "match-sorter": "^6.3.1",
     "react": "^18.2.0",

@@ -2,89 +2,116 @@ import { useState, useEffect } from 'react';
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-material.css";
 import Button from '@mui/material/Button';
+import dayjs from 'dayjs';
+
 
 import { AgGridReact } from "ag-grid-react";
-
-import  Container  from '@mui/material/Container';
-//import TextField from '@mui/material/TextField';
-//import {fetchCustomers} from './Customers';
+import Container from '@mui/material/Container';
 import Stack from '@mui/material/Stack';
+
+//import 'dayjs/locale/fi';
+
+import AddPractise from './AddPractise';
+
+
 
 
 function Practises() {
-  const [practise, setPractise] = useState([]);
-  const [newPractise, setNewPractise] = useState({
-    date: '',
-    duration: '',
-    activity: '',
-    Customer: ''
-  });
-  
 
-  /*id (long)
-  • date (Date)
-  • duration in minutes (int)
-  • activity (String)
-  • Customer (customer.id) */
+  const [practises, setPractises] = useState([]);
 
-
-  
   useEffect(() => {
     fetchPractises();
+
   }, []);
 
   const [content] = useState([
-    { field: 'date', sortable: true, filter: true},
-    { field: 'duration', sortable: true, filter: true },
-    { field: 'activity', sortable: true, filter: true},
-    { field: 'links', sortable: true, filter: true, render: (rowData) => {
-        // Tarkistetaan, onko 'links' määritelty ja onko siellä 'customer' -rel
-        const customerLink = rowData.links && rowData.links.find(link => link.rel === 'customer');
-  
-        // Jos rel 'customer' löytyy, palautetaan sen href, muuten palautetaan tyhjä merkkijono
-        return customerLink ? customerLink.href : '';
-      },
+    { field: 'date', sortable: true, filter: true,
+    //Päivämäärän muotoilu
+    cellRenderer: (params) => (
+      <span>
+        {dayjs(params.value).format('DD.MM.YYYY hh:mm A')}
+      </span>
+    ),
     },
+    { field: 'duration', sortable: true, filter: true },
+    { field: 'activity', sortable: true, filter: true },
+    { field: 'customerName', sortable: true, filter: true },
     {
+      //onClick metodi harjoitusten poistamiselle
       cellRenderer: params => <Button size="small" onClick={() => deletePractise(params.data.links)}>Delete</Button>,
       width: 120
     },
-    
+
   ]);
-
-
-  const fetchPractises = () => {
-    fetch('http://traineeapp.azurewebsites.net/api/trainings')
-    .then(response => {
-      if (response.ok) {
-        return response.json();
-      } else {
-        throw new Error("Virhe tietojen hakemisessa");
-      }
-    })
-    .then(data => {
-      if (Array.isArray(data.content)) {
-        setPractise(data.content);
-        console.log(data.content)
-      } else {
-        throw new Error("Haettu data ei ole taulukko");
-      }
-  })
-    .catch(error => {
-      console.error("Virhe:", error);
-  })}
-
-
-  //POISTAA HARJOITUKSEN
+    //Haetaan ensin kaikki harjoitteet ja niihin liitetyt asiakkaat
+    const fetchPractises = () => {
+      console.log(practises)
+      fetch('http://traineeapp.azurewebsites.net/api/trainings')
+        .then((response) => response.json())
+        .then((data) => {
+          const practiseData = data.content.map((trainingInfo) => {
+            const customerLink = trainingInfo.links.find(
+              (link) => link.rel === "customer"
+            ).href;
+            const practiseLink = trainingInfo.links.find(
+              (link) => link.rel === "self"
+            ).href;
+  
+            return Promise.all([
+              fetch(practiseLink).then((response) => response.json()),
+              fetch(customerLink).then((response) => response.json())
+            ])
+              .then(([practiseInfo, customerInfo]) => {
+                const { date, duration, activity } = practiseInfo;
+                const { firstname, lastname } = customerInfo;
+  
+                return {
+                  ...trainingInfo,
+                  customerLink,
+                  practiseLink,
+                  date,
+                  duration,
+                  activity,
+                  customerName: `${firstname} ${lastname}`,
+                };
+              })
+              .catch((err) => {
+                console.error(err);
+                return {
+                  ...trainingInfo,
+                  //date: "N/A",
+                  //duration: "N/A",
+                  //activity: "N/A",
+                 // customerId: "N/A",
+                  //customerName: "N/A",
+                };
+              });
+          });
+  
+          Promise.all(practiseData)
+            .then((trainingEntries) => {
+              setPractises(trainingEntries);
+            })
+            .catch((error) => console.error(error));
+        })
+        .catch((err) => console.error(err));
+    };
+  
+  //TOIMINNALLISUUS HARJOITUSTEN POISTAMISELLE
   const deletePractise = (links) => {
+    console.log(links);
+
     if (window.confirm("Are you sure?")) {
       const url = links.find(link => link.rel === 'self');
   
       if (url) {
         fetch(url.href, { method: 'DELETE' })
           .then(response => {
-            if (response.ok)
+            if (response.ok){
               fetchPractises();
+              console.log(url);
+            }
             else
               throw new Error("Error in DELETE: " + response.statusText);
           })
@@ -95,55 +122,13 @@ function Practises() {
     }
   };
 
-  //LISÄÄ ASIAKKAAN
-  const handleInputChange = (e) => {
-    setNewPractise({
-      ...newPractise,
-      [e.target.name]: e.target.value
-    });
-  };
-
-  const addPractise =() => {
-    fetch('http://traineeapp.azurewebsites.net/api/trainings', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(newPractise)
-  })
-    .then(response => {
-      if(response.ok)
-        fetchPractises();
-      else
-        throw new Error("Error in POST: " + response.statusText);
-    })
-      .catch(err => console.log(err));
-  };
-
-  //ETSII YHDEN ASIAKKAAN, customers/{id}
-
-
- 
-  
-  
-
   return (
     <Container>
-
-      <h1>Practises</h1>
       <Stack>
-<div>
-          <input type="text" name="date" placeholder="date" onChange={handleInputChange} />
-          <input type="text" name="duration" placeholder="duration" onChange={handleInputChange} />
-          <input type="text" name="activity" placeholder="activity" onChange={handleInputChange} />
-          <input type="text" name="Customer" placeholder="Customer" onChange={handleInputChange} />
-        
-          <Button size="small" onClick={addPractise}>Add Practise</Button>
-        </div>
-
+      <AddPractise fetchPractises={fetchPractises} />
         <div className="ag-theme-material" style={{ height: 500 }}>
           <AgGridReact
-            rowData={practise}
+            rowData={practises}
             columnDefs={content}
             pagination={true}
             paginationAutoPageSize={true}
@@ -151,7 +136,6 @@ function Practises() {
         </div>
       </Stack>
     </Container>
-  );
+  )
 }
-
 export default Practises;

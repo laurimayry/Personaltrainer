@@ -7,6 +7,7 @@ import { AgGridReact } from "ag-grid-react";
 //import { useParams } from 'react-router-dom';
 
 
+
 import  Container  from '@mui/material/Container';
 //import TextField from '@mui/material/TextField';
 
@@ -63,6 +64,8 @@ function Customers() {
 
   //POISTAA ASIAKKAAN
   const deleteCustomer = (links) => {
+    console.log(links);
+
     if (window.confirm("Are you sure?")) {
       const url = links.find(link => link.rel === 'self');
   
